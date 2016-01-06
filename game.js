@@ -3,16 +3,17 @@ var context = canvas.getContext("2d");
 
 var spaceship =
 {
-  color: "black",
+  color: "white",
   width: 17,
   height: 44,
   position: { x: 0, y: 0 },
   angle: 0,
   velocity: { x: 1, y: 0 },
-  thrust: 0.3,
+  thrust: 0.1,
   engineOn: false,
   rotatingLeft: false,
-  rotatingRight: false
+  rotatingRight: false,
+  falling: true,
 }
 
 function drawSpaceship()
@@ -57,7 +58,7 @@ function drawSpaceship()
   context.restore();
 }
 
-var gravity = 0.1;
+var gravity = 0.05;
 
 function updateSpaceship()
 {
@@ -79,13 +80,130 @@ function updateSpaceship()
   spaceship.velocity.y -= gravity;
 }
 
+var message = "";
+
+var platform = {
+  width: 50,
+  position: { x: 500, y: 500 },
+}
+
+function drawPlatform()
+{
+  context.save();
+  context.beginPath();
+  context.rect(platform.position.x, platform.position.y, platform.width, 5);
+  context.fillStyle = "green";
+  context.fill();
+  context.restore();
+}
+
+function drawGround() {
+  context.save();
+  context.beginPath();
+  context.rect(0, platform.position.y + 1, canvas.width, canvas.height - platform.position.y + 1);
+  context.fillStyle = "red";
+  context.fill();
+  context.restore();
+}
+
+function checkLanding(){
+  if (spaceship.falling){
+    if (spaceship.position.y < platform.position.y + 50 - spaceship.height &&
+      spaceship.position.y > platform.position.y - 50 - spaceship.height ){
+      if  (spaceship.position.y > platform.position.y - spaceship.height) {
+        if (spaceship.position.x < platform.position.x + platform.width - spaceship.width &&
+            spaceship.position.x > platform.position.x){
+          if (spaceship.velocity.x < 1 && spaceship.velocity.x > -1){
+            if (spaceship.velocity.y < .2){
+              if (spaceship.angle > -.1 && spaceship.angle < .1){
+                spaceship.velocity = { x: 0, y: 0};
+                spaceship.falling = false;
+                console.log("Nice Landing!");
+                return true;
+              } else {
+                console.log("too much angle!");
+                return true;
+              }
+            } else {
+            console.log("too much vertical speed!");
+            return true;
+            } // end if
+          } else {
+            console.log("too much horizontal speed!");
+            return true;
+          }
+        } else {
+        console.log("not on platform!");
+        return true;
+        }
+        } else {
+          return false;
+      } // end within 1 of platform
+   } // check for landing
+   return false
+  } // end 'are we falling?' if
+  return true;
+} // end checkLanding
+
+var stars = [];
+
+for (var i = 0; i < 500; i++) {
+  stars[i] = {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.sqrt(Math.random() * 2),
+    alpha: 1.0,
+    decreasing: true,
+    dRatio: Math.random()*0.05
+  };
+}
+
+function drawStars() {
+  context.save();
+  context.fillStyle = "#111"
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  for (var i = 0; i < stars.length; i++) {
+    var star = stars[i];
+    context.beginPath();
+    context.arc(star.x, star.y, star.radius, 0, 2*Math.PI);
+    context.closePath();
+    context.fillStyle = "rgba(255, 255, 255, " + star.alpha + ")";
+    if (star.decreasing == true) {
+      star.alpha -= star.dRatio;
+      if (star.alpha < 0.1) {
+        star.decreasing = false;
+      }
+    } else {
+      star.alpha += star.dRatio;
+      if (star.alpha > 0.95) {
+        star.decreasing = true;
+      }
+    }
+    context.fill();
+  }
+  context.restore();
+}
+
+
+
 function draw() {
 
   // clearing the canvas
   context.clearRect(0, 0, canvas.width, canvas.height);
-  updateSpaceship();
+  drawStars();
   drawSpaceship();
-  requestAnimationFrame(draw);
+  drawGround();
+  drawPlatform();
+  if ( checkLanding() ) {
+    if ( spaceship.falling === false ) {
+        gravity = 0;
+        spaceship.velocity = { x: 0, y: 0};
+        requestAnimationFrame(draw);
+    }
+  } else {
+    updateSpaceship();
+    requestAnimationFrame(draw);
+  }
 }
 
 
