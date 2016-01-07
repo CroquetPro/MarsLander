@@ -6,4 +6,4 @@ Be mindful of remaining fuel reserves!
 
 [Live demo][link]
 
-[link]: croquetpro.github.io
+[link]: http://croquetpro.github.io
