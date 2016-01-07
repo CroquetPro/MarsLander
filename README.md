@@ -4,4 +4,6 @@ Try to land on the green landing pad using the arrow keys.
 
 Be mindful of remaining fuel reserves!
 
-[Live demo][croquetpro.github.io]  
+[Live demo][link]
+
+[link]: croquetpro.github.io
