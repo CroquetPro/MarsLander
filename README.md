@@ -6,4 +6,4 @@ Be mindful of remaining fuel reserves!
 
 [Live demo][link]
 
-[link]: http://croquetpro.github.io/Marslander
+[link]: http://croquetpro.github.io/MarsLander
